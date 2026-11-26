@@ -30,6 +30,9 @@ Chrome/Chromium binary and should print "✓ no issues" for every width:
 node tools/responsive_audit.mjs /path/to/chrome http://127.0.0.1:8000/ /tmp/shots
 ```
 
+Exit codes: `0` all widths passed, `1` layout issues found, `2` usage error or the audit
+couldn't run (for example, the dev server isn't running). Chrome is always shut down afterwards.
+
 Before you finish a change, run `ruff format .`, `ruff check .` and `pytest`. CI runs the same
 checks on Python 3.12–3.14, plus a lockfile check, `check --deploy` and `collectstatic` with
 production settings.
