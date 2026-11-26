@@ -1,0 +1,42 @@
+{% load static site_tags %}
+<header class="site-header" data-header>
+  <div class="container site-header__inner">
+    <a class="brand" href="{% url 'core:home' %}" aria-label="{{ site.name }} home">
+      {# The logo already contains the name and tagline, so no separate brand text. #}
+      <img src="{% static 'img/logo.png' %}" alt="" width="405" height="574" class="brand__logo">
+    </a>
+
+    <div class="header-actions">
+      {# Hidden until site.js wires it up, so it never appears as a dead button without JS. #}
+      {# Day/night switch. Hidden until site.js wires it up, so it never shows as a dead control without JS. #}
+      <button class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Dark theme" data-theme-toggle hidden>
+        <span class="theme-switch__sky theme-switch__sky--day" aria-hidden="true"></span>
+        <span class="theme-switch__sky theme-switch__sky--night" aria-hidden="true"></span>
+        <span class="theme-switch__stars" aria-hidden="true">{% for _ in "123456789" %}<i></i>{% endfor %}</span>
+        <svg class="theme-switch__clouds" viewBox="0 0 64 32" aria-hidden="true" focusable="false">
+          <path class="theme-switch__cloud theme-switch__cloud--back" d="M30 31c-1-5 3-9 8-8 1-5 7-7 11-4 3-2 8 0 8 4 4 0 7 3 7 8Z"/>
+          <path class="theme-switch__cloud" d="M3 31c-1-4 2-7 6-7 1-6 8-9 13-5 3-3 9-2 10 3 4-1 8 2 8 6 0 1 0 2-1 3Z"/>
+        </svg>
+        <span class="theme-switch__knob" aria-hidden="true">
+          <span class="theme-switch__sun"></span>
+          <span class="theme-switch__moon"><i></i><i></i><i></i></span>
+        </span>
+      </button>
+      <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-toggle>
+        <span class="nav-toggle__open">{% icon "menu" %}</span>
+        <span class="nav-toggle__close">{% icon "close" %}</span>
+        <span class="visually-hidden">Menu</span>
+      </button>
+    </div>
+
+    <nav id="site-nav" class="site-nav" aria-label="Main" data-nav>
+      <ul role="list">
+        <li><a href="{% url 'core:home' %}#about">About</a></li>
+        <li><a href="{% url 'core:home' %}#services">Services</a></li>
+        <li><a href="{% url 'core:home' %}#projects">Projects</a></li>
+        <li><a href="{% url 'core:home' %}#training">Training</a></li>
+        <li><a class="site-nav__cta" href="{% url 'core:home' %}#contact">Contact us</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
