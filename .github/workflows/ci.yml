@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: pip install -r requirements-dev.txt uv
+      - name: Lockfile and requirements are in sync
+        run: |
+          uv lock --check
+          uv export -q --format requirements-txt --no-dev --no-hashes --no-emit-project -o /tmp/req.txt
+          diff <(grep -v '^#' requirements.txt) <(grep -v '^#' /tmp/req.txt)
+      - name: Lint
+        run: |
+          ruff check .
+          ruff format --check .
+      - name: Tests
+        run: pytest
+      - name: Production checks
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.prod
+          DJANGO_SECRET_KEY: ci-only-${{ github.run_id }}-not-a-real-secret-key-0123456789abcdef
+          DJANGO_ALLOWED_HOSTS: example.org
+          DJANGO_SECURE_HSTS_SECONDS: "31536000"
+        run: |
+          python manage.py check --deploy --fail-level ERROR
+          python manage.py collectstatic --noinput
