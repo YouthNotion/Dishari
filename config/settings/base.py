@@ -97,8 +97,8 @@ STORAGES = {
 SECURE_CSP = {
     "default-src": [CSP.SELF],
     "script-src": [CSP.SELF],
-    # 'unsafe-inline' only for the <noscript> style fallback in base.html.
-    "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
+    # No inline styles anywhere: the no-JS fallback is a stylesheet (css/noscript.css).
+    "style-src": [CSP.SELF],
     "img-src": [CSP.SELF, "data:"],
     "font-src": [CSP.SELF],
     "object-src": [CSP.NONE],

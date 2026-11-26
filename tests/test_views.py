@@ -82,3 +82,14 @@ def test_theme_switch_is_wired_up(client):
     assert "data-theme-toggle" in html
     assert 'role="switch"' in html and 'aria-label="Dark theme"' in html
     assert '<meta name="color-scheme" content="light dark">' in html
+
+
+def test_no_js_fallback_is_a_stylesheet_not_inline_css(client):
+    """Regression for #2: the no-JS menu fix lives in css/noscript.css, so the CSP
+    can forbid inline styles entirely."""
+    response = client.get("/")
+    html = response.content.decode()
+
+    assert '<noscript><link rel="stylesheet" href="/static/css/noscript.css"></noscript>' in html
+    assert "<style" not in html
+    assert "unsafe-inline" not in response.headers["Content-Security-Policy"]
