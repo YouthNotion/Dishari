@@ -1,0 +1,12 @@
+{% load site_tags %}
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <p class="site-footer__copy">© {% now "Y" %} {{ site.name }} · {{ site.tagline }}</p>
+    <ul class="site-footer__links" role="list">
+      <li><a href="{{ site.facebook_url }}" rel="noopener" target="_blank" aria-label="Facebook (opens in a new tab)">{% icon "facebook" 18 %}</a></li>
+      <li><a href="{{ site.whatsapp_url }}" rel="noopener" target="_blank" aria-label="WhatsApp (opens in a new tab)">{% icon "whatsapp" 18 %}</a></li>
+      <li><a href="mailto:{{ site.email }}" aria-label="Email {{ site.name }}">{% icon "mail" 18 %}</a></li>
+      <li><a href="#main" class="site-footer__top">Back to top ↑</a></li>
+    </ul>
+  </div>
+</footer>

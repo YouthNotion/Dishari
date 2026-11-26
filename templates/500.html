@@ -1,0 +1,20 @@
+{% load static %}<!doctype html>
+{# Rendered without a request context: keep this template free of DB access. #}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Something went wrong · Dishari</title>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+</head>
+<body>
+  <main class="section error-page">
+    <div class="container error-page__inner">
+      <img src="{% static 'img/logo.png' %}" alt="Dishari logo" width="88" height="125">
+      <h1 class="section__title">Something went wrong</h1>
+      <p class="lead">An unexpected error occurred. Please try again in a few minutes.</p>
+      <a class="btn btn--primary" href="/">Back to home</a>
+    </div>
+  </main>
+</body>
+</html>

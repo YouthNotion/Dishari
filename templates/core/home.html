@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static site_tags %}
+
+{% block content %}
+{# ---------- Hero ---------- #}
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container hero__inner">
+    <div class="hero__text">
+      <p class="eyebrow">Since {{ site.established_year }} · {{ site.location }}</p>
+      <h1 id="hero-title" class="hero__title">
+        {{ site.name }} provides
+        <span class="hero__phrase" data-rotate>{{ site.hero_phrases.0 }}</span>
+      </h1>
+      <p class="hero__lead">
+        Shelter, care, education and skills training for abandoned children, vulnerable
+        women and elderly women, so that every person has the chance to grow.
+      </p>
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#projects">Our projects {% icon "arrow-right" 18 %}</a>
+        <a class="btn btn--outline" href="#contact">Get in touch</a>
+      </div>
+      <dl class="hero__facts">
+        <div><dt>{{ years_active }}+</dt><dd>years of service</dd></div>
+        <div><dt>{{ projects|length }}</dt><dd>shelter projects</dd></div>
+        <div><dt>{{ trainings|length }}</dt><dd>training programmes</dd></div>
+      </dl>
+    </div>
+    <img class="hero__logo" src="{% static 'img/logo.png' %}" alt="{{ site.name }} logo: hands holding a seedling beneath a leaf, established {{ site.established_year }}" width="405" height="574">
+  </div>
+  {{ site.hero_phrases|json_script:"hero-phrases" }}
+</section>
+
+{# ---------- About ---------- #}
+<section id="about" class="section" aria-labelledby="about-title">
+  <div class="container split">
+    <div class="split__text">
+      <p class="eyebrow">About us</p>
+      <h2 id="about-title" class="section__title">Who we are</h2>
+      <p class="lead">{{ site.mission }}</p>
+    </div>
+    <figure class="split__media">
+      <img src="{% static 'img/about.jpg' %}" alt="Women and children gathered at a {{ site.name }} community session" width="1200" height="900" loading="lazy">
+    </figure>
+  </div>
+</section>
+
+{# ---------- Services ---------- #}
+<section id="services" class="section section--tint" aria-labelledby="services-title">
+  <div class="container">
+    <header class="section__header">
+      <p class="eyebrow">What we do</p>
+      <h2 id="services-title" class="section__title">Our services</h2>
+    </header>
+    <div class="grid grid--3">
+      {% for area in service_areas %}
+      <article class="card service">
+        <div class="service__icon">{% icon area.icon 28 %}</div>
+        <h3 class="card__title">{{ area.title }}</h3>
+        <ul class="service__list" role="list">
+          {% for item in area.items %}<li>{{ item }}</li>{% endfor %}
+        </ul>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ---------- Projects ---------- #}
+<section id="projects" class="section" aria-labelledby="projects-title">
+  <div class="container">
+    <header class="section__header">
+      <p class="eyebrow">Our projects</p>
+      <h2 id="projects-title" class="section__title">Shelter, care and a future</h2>
+    </header>
+    <div class="grid grid--3">
+      {% for project in projects %}
+      <article class="card project">
+        <span class="project__number" aria-hidden="true">{{ forloop.counter }}</span>
+        <h3 class="card__title">{{ project.name }}</h3>
+        <p class="project__who">{{ project.beneficiaries }}</p>
+        <ul class="checklist" role="list">
+          {% for provision in project.provisions %}<li>{% icon "check" 18 %}{{ provision }}</li>{% endfor %}
+        </ul>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ---------- Training ---------- #}
+<section id="training" class="section section--tint" aria-labelledby="training-title">
+  <div class="container">
+    <header class="section__header">
+      <p class="eyebrow">Skills for independence</p>
+      <h2 id="training-title" class="section__title">Our training programmes</h2>
+    </header>
+    <div class="grid grid--3">
+      {% for program in trainings %}
+      <article class="card training">
+        <img class="training__img" src="{% static program.image %}" alt="{{ program.image_alt }}" loading="lazy" width="600" height="450">
+        <div class="training__body">
+          <h3 class="card__title">{{ program.title }}</h3>
+          <p class="training__meta">{{ program.description }}</p>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ---------- Contact ---------- #}
+<section id="contact" class="section" aria-labelledby="contact-title">
+  <div class="container contact">
+    <div class="contact__intro">
+      <p class="eyebrow">Contact</p>
+      <h2 id="contact-title" class="section__title">Get in touch</h2>
+      <p class="lead">Want to volunteer, support a project or learn more about our work? Call or message us. We'd love to hear from you.</p>
+      <div class="contact__actions">
+        <a class="btn btn--primary" href="tel:{{ site.phone_e164 }}">{% icon "phone" 18 %} Call us</a>
+        <a class="btn btn--whatsapp" href="{{ site.whatsapp_url }}" rel="noopener" target="_blank">{% icon "whatsapp" 18 %} WhatsApp<span class="visually-hidden"> (opens in a new tab)</span></a>
+      </div>
+    </div>
+
+    <ul class="contact__list" role="list">
+      <li class="contact__item">
+        <span class="contact__icon">{% icon "phone" 20 %}</span>
+        <div><h3>Phone &amp; WhatsApp</h3><a href="tel:{{ site.phone_e164 }}">{{ site.phone }}</a></div>
+      </li>
+      <li class="contact__item">
+        <span class="contact__icon">{% icon "mail" 20 %}</span>
+        <div><h3>Email</h3><a href="mailto:{{ site.email }}">{{ site.email }}</a></div>
+      </li>
+      <li class="contact__item">
+        <span class="contact__icon">{% icon "facebook" 20 %}</span>
+        <div><h3>Facebook</h3><a href="{{ site.facebook_url }}" rel="noopener" target="_blank">Follow us on Facebook<span class="visually-hidden"> (opens in a new tab)</span></a></div>
+      </li>
+      <li class="contact__item">
+        <span class="contact__icon">{% icon "map-pin" 20 %}</span>
+        <div><h3>Address</h3><address>{{ site.address }}</address></div>
+      </li>
+    </ul>
+  </div>
+</section>
+{% endblock %}
