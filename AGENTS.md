@@ -65,6 +65,7 @@ production settings.
 | `pyproject.toml` / `uv.lock` | Dependency source of truth. `requirements*.txt` are generated from the lock |
 | `tests/` | pytest suite (`test_content.py`, `test_views.py`, `test_settings.py`) |
 | `tools/responsive_audit.mjs` | Headless-Chrome layout audit across 10 widths (Node 22+, no deps) |
+| `tools/theme_test.mjs` | Headless-Chrome test of the light/dark theme logic (Node 22+, no deps) |
 | `.github/workflows/ci.yml` | CI: lock sync, ruff, pytest, deploy checks |
 
 ## Conventions and rules
@@ -85,6 +86,10 @@ production settings.
   add or reuse a token. `static/js/theme-init.js` must stay a tiny blocking script in `<head>`,
   before the stylesheet, so a saved theme applies before first paint. The choice is stored in
   `localStorage["theme"]`, and with no choice saved the site follows the OS setting.
+  `theme-init.js` is the **single source of truth** for reading it: it exposes
+  `window.dishariTheme` (`STORAGE_KEY`, `readSavedTheme()`, `systemTheme()`), and `site.js`
+  must use that instead of reading `localStorage` itself. Only `"light"` and `"dark"` are valid.
+  After changing theme logic, run `node tools/theme_test.mjs <chrome> http://127.0.0.1:8000/`.
   - The one exception to tokens is the day/night switch (`.theme-switch*`). Its sky, sun and moon
     are illustrative colours, so they're set with `:root[data-theme="dark"]` selectors. Its
     animations are enabled only after first paint, when `site.js` adds `.is-ready`.
