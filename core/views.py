@@ -1,7 +1,7 @@
 from django.http import HttpRequest, HttpResponse
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_safe
 from django.views.generic import TemplateView
 
 from . import content
@@ -21,7 +21,7 @@ class HomeView(TemplateView):
         return context
 
 
-@require_GET
+@require_safe  # GET and HEAD: many uptime monitors and load balancers probe with HEAD.
 @never_cache
 def healthz(request: HttpRequest) -> HttpResponse:
     """Liveness probe for load balancers / uptime monitors."""

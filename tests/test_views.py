@@ -66,6 +66,14 @@ def test_healthz(client):
     assert "no-cache" in response.headers["Cache-Control"]
 
 
+def test_healthz_accepts_head(client):
+    """Regression for #3: uptime monitors often probe with HEAD."""
+    response = client.head(reverse("core:healthz"))
+
+    assert response.status_code == 200
+    assert "no-cache" in response.headers["Cache-Control"]
+
+
 def test_healthz_rejects_post(client):
     assert client.post(reverse("core:healthz")).status_code == 405
 
