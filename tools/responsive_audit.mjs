@@ -66,6 +66,8 @@ async function main() {
     throw new Error("Chrome did not expose a DevTools page within 15s");
   };
   const page = await Promise.race([findPage(), chromeExited]);
+  // Chrome exiting is only an error during startup; we kill it ourselves at the end.
+  chromeExited.catch(() => {});
   ws = new WebSocket(page.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => {
     ws.addEventListener("open", resolve, { once: true });
@@ -214,6 +216,16 @@ try {
   process.exitCode = 2;
 } finally {
   try { ws?.close(); } catch { /* already closed */ }
-  chrome?.kill();
-  rmSync(profile, { recursive: true, force: true });
+  if (chrome && chrome.exitCode === null && chrome.signalCode === null) {
+    // kill() only sends the signal. Wait for Chrome to actually exit (max 5s) before
+    // deleting its profile, or it may still be writing files there (ENOTEMPTY).
+    const exited = new Promise((resolve) => chrome.once("exit", resolve));
+    chrome.kill();
+    await Promise.race([exited, sleep(5000)]);
+  }
+  try {
+    rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  } catch (err) {
+    console.error(`Warning: could not remove temporary profile ${profile}: ${err.message}`);
+  }
 }
