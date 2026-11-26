@@ -25,8 +25,20 @@ jobs:
       - name: Lockfile and requirements are in sync
         run: |
           uv lock --check
-          uv export -q --format requirements-txt --no-dev --no-hashes --no-emit-project -o /tmp/req.txt
-          diff <(grep -v '^#' requirements.txt) <(grep -v '^#' /tmp/req.txt)
+          # Both requirement files are generated from uv.lock and must match a fresh export.
+          # Header comments (lines starting with "#") hold the export command, so ignore them.
+          check() {
+            local file="$1"; shift
+            uv export -q --format requirements-txt --no-hashes --no-emit-project "$@" -o "/tmp/$file"
+            if ! diff -u <(grep -v '^#' "$file") <(grep -v '^#' "/tmp/$file"); then
+              echo "::error file=$file::$file is out of date with uv.lock. Regenerate it with: uv export --format requirements-txt --no-hashes --no-emit-project $* -o $file"
+              return 1
+            fi
+          }
+          status=0
+          check requirements.txt --no-dev || status=1
+          check requirements-dev.txt --extra dev || status=1
+          exit "$status"
       - name: Lint
         run: |
           ruff check .
