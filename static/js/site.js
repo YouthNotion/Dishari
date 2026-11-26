@@ -85,13 +85,10 @@
     const root = document.documentElement;
     const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
 
-    const savedTheme = () => {
-      try {
-        return localStorage.getItem("theme");
-      } catch {
-        return null;
-      }
-    };
+    // Provided by theme-init.js (always loaded first, in <head>), so both scripts
+    // agree on what a valid saved theme is.
+    const themeApi = window.dishariTheme;
+    if (!themeApi) return;
     const apply = (theme) => {
       root.dataset.theme = theme;
       // role="switch" labelled "Dark theme": checked means dark.
@@ -107,7 +104,7 @@
       const theme = root.dataset.theme === "dark" ? "light" : "dark";
       apply(theme);
       try {
-        localStorage.setItem("theme", theme);
+        localStorage.setItem(themeApi.STORAGE_KEY, theme);
       } catch {
         // Not persisted; the choice still applies for this page view.
       }
@@ -115,7 +112,7 @@
 
     // Follow OS changes until the visitor makes an explicit choice.
     systemDark.addEventListener("change", (event) => {
-      if (!savedTheme()) apply(event.matches ? "dark" : "light");
+      if (!themeApi.readSavedTheme()) apply(event.matches ? "dark" : "light");
     });
   }
 
