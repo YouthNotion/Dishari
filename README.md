@@ -30,6 +30,96 @@ Open <http://127.0.0.1:8000>. The dev server restarts on Python changes, and the
 reloads itself whenever you save a template, CSS, JS or Python file
 ([django-browser-reload](https://github.com/adamchainz/django-browser-reload), dev only).
 
+## Contributing (new developers, start here)
+
+Thanks for helping! Whether you want to fix a bug, add something new or pick up an open
+[issue](https://github.com/YouthNotion/Dishari/issues), the process is the same:
+**work on a branch, open a pull request, and the maintainer reviews and merges it.**
+
+> [!CAUTION]
+> **Never push to `master`.** `master` is what runs the live website, so a single unreviewed
+> bug pushed there can take the site down. All changes reach `master`
+> only through a reviewed pull request, merged by the maintainer
+> ([@msneloy](https://github.com/msneloy)).
+
+### Step by step
+
+1. **Pick something to work on.**
+   - Browse the [open issues](https://github.com/YouthNotion/Dishari/issues). If you're new, start
+     with [`good first issue`](https://github.com/YouthNotion/Dishari/labels/good%20first%20issue).
+   - Comment on the issue so it can be assigned to you, and nobody else works on it at the same
+     time.
+   - Want to add something that has no issue yet? Open an issue first and describe the idea,
+     so it can be agreed on before you spend time on it.
+
+2. **Get the latest `master` and create a branch.**
+
+   ```bash
+   git switch master
+   git pull
+   git switch -c fix/3-healthz-head     # <type>/<issue-number>-<short-description>
+   ```
+
+   Branch name prefixes: `feat/` (new feature), `fix/` (bug fix), `docs/`, `test/`, `chore/`,
+   `refactor/`.
+
+3. **Make your change and run the checks locally.** Set up the project with the
+   [Quick start](#quick-start) first.
+
+   ```bash
+   ruff format . && ruff check .   # formatting and lint
+   pytest                          # tests
+   ```
+
+   - Add or update tests for any behaviour you change.
+   - If you changed layout or CSS, also run the responsive audit (see [Development](#development)).
+   - Check your change in both the light and the dark theme.
+
+4. **Commit using [Conventional Commits](https://www.conventionalcommits.org/).**
+
+   ```bash
+   git commit -m "fix: allow HEAD requests on /healthz" -m "Uptime monitors probe with HEAD; require_GET rejected them with 405. Fixes #3."
+   ```
+
+   - Types: `feat:`, `fix:`, `docs:`, `test:`, `ci:`, `build:`, `chore:`, `refactor:`, `style:`.
+   - The subject line is short and imperative. The body explains *what* changed and *why*.
+   - Write `Fixes #<issue>` so the issue closes automatically when the pull request is merged.
+
+5. **Push your branch and open a pull request into `master`.**
+
+   ```bash
+   git push -u origin fix/3-healthz-head
+   ```
+
+   Then open the pull request on GitHub, or run `gh pr create`. In the description, say:
+   - **what** changed and **why** (link the issue)
+   - **how you tested** it
+   - **screenshots** (light and dark) for anything visual
+
+6. **Wait for CI and review.**
+   - CI must pass. It runs lint, tests and production checks on every pull request.
+   - The maintainer reviews the code. If changes are requested, push more commits to the **same
+     branch**, and the pull request updates itself.
+   - **Only the maintainer merges.** Please don't merge your own pull request.
+
+7. **After the merge**, clean up and start fresh for your next change:
+
+   ```bash
+   git switch master && git pull
+   git branch -d fix/3-healthz-head
+   ```
+
+### Ground rules
+
+- **Never push or force-push to `master`.** Don't force-push branches other people are working
+  on either.
+- **One topic per pull request.** Small pull requests get reviewed and merged faster.
+- **Never commit secrets** (`.env`, keys, passwords). Configuration comes from environment
+  variables, see [Configuration](#configuration).
+- Follow the project conventions in [AGENTS.md](AGENTS.md). They apply to people as well as AI
+  tools.
+- Stuck or unsure? Ask in the issue or the pull request. Questions are welcome.
+
 ## Editing content
 
 | To change… | Edit |
@@ -70,15 +160,12 @@ The responsive audit loads the site in headless Chrome at 10 widths. It checks f
 overflow, tap targets under 24px, the smallest font size, that the hero phrases fit, and that
 the mobile menu works. Run it after layout or CSS changes. It uses only Node 22+ built-ins.
 
-### Workflow
+### Continuous integration
 
-- Branch from `master`, open a pull request, and let CI pass before merging.
-- Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/)
-  (`feat:`, `fix:`, `docs:`, `test:`, `ci:`, `build:`, `chore:`). The body explains *what* and
-  *why*.
-- CI (`.github/workflows/ci.yml`) runs on Python 3.12–3.14. It checks that the lockfile and
-  requirements are in sync, runs ruff and the tests, then runs `check --deploy` and
-  `collectstatic` with production settings.
+CI (`.github/workflows/ci.yml`) runs on every pull request, on Python 3.12–3.14. It checks that
+the lockfile and requirements are in sync, runs ruff and the tests, then runs `check --deploy`
+and `collectstatic` with production settings. Pull requests are only merged once CI passes.
+For the branch and pull request workflow, see [Contributing](#contributing-new-developers-start-here).
 
 ## Project layout
 

@@ -36,8 +36,10 @@ production settings.
 
 ## Git workflow
 
-- Never commit to `master`. Work on a branch and open a pull request. The repository owner
-  reviews and merges.
+- **Never commit or push to `master`**: it is the live site. Work on a branch named
+  `<type>/<issue-number>-<short-description>` and open a pull request. Only the maintainer
+  (@msneloy) reviews and merges. Never merge your own pull request. The full contributor
+  workflow is in README.md → *Contributing*.
 - Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`,
   `test:`, `ci:`, `build:`, `chore:`, `refactor:`, `style:`, with `!` and a `BREAKING CHANGE:`
   footer for breaking changes. The subject is imperative and at most ~72 characters. The body
