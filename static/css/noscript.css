@@ -1,0 +1,19 @@
+/* Loaded only when JavaScript is disabled (from a <noscript> in base.html).
+   Without JS the mobile menu can't be toggled, so instead of the collapsible
+   overlay it is shown as a normal block under the logo. */
+
+.nav-toggle { display: none !important; }
+.site-nav { display: block !important; }
+
+@media (max-width: 860px) {
+  /* A sticky header holding the whole menu would cover the page while scrolling. */
+  .site-header { position: static; }
+  .site-header__inner { flex-wrap: wrap; }
+  .site-nav {
+    position: static;
+    width: 100%;
+    padding: 0 0 8px;
+    border: 0;
+    box-shadow: none;
+  }
+}
