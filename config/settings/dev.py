@@ -5,7 +5,10 @@ from .base import env, env_list
 
 DEBUG = True
 SECRET_KEY = env("DJANGO_SECRET_KEY", "dev-insecure-secret-key-do-not-use-in-production")  # noqa: S105
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,[::1]")
+# Local hosts are always allowed in dev; DJANGO_ALLOWED_HOSTS only *adds* to them
+# (e.g. a LAN IP for testing on a phone), so an env file can't lock you out of localhost.
+_LOCAL_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
+ALLOWED_HOSTS = list(dict.fromkeys([*_LOCAL_HOSTS, *env_list("DJANGO_ALLOWED_HOSTS")]))
 
 # Serve un-hashed static files straight from disk without collectstatic.
 STORAGES = {
