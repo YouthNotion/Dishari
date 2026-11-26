@@ -2,7 +2,7 @@
 
 from django import template
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
+from django.utils.safestring import SafeString, mark_safe
 
 register = template.Library()
 
@@ -58,11 +58,11 @@ _ICON_PATHS: dict[str, str] = {
 
 
 @register.simple_tag
-def icon(name: str, size: int = 24, css_class: str = "icon"):
+def icon(name: str, size: int = 24, css_class: str = "icon") -> SafeString:
     """Render a decorative inline SVG icon. Unknown names render nothing."""
     paths = _ICON_PATHS.get(name)
     if paths is None:
-        return ""
+        return SafeString("")
     return format_html(
         '<svg class="{}" width="{}" height="{}" viewBox="0 0 24 24" fill="none" '
         'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" '

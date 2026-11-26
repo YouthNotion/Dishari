@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.http import HttpRequest, HttpResponse
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
@@ -10,7 +12,7 @@ from . import content
 class HomeView(TemplateView):
     template_name = "core/home.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context.update(
             service_areas=content.SERVICE_AREAS,
