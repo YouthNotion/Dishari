@@ -9,13 +9,24 @@
 //
 // Usage (with the dev server running). Exits non-zero if any check fails:
 //   node tools/theme_test.mjs <chrome-binary> http://127.0.0.1:8000/
+// Exit codes: 0 all checks passed, 1 a check failed or the test could not run, 2 usage error.
+// Chrome is always shut down and its temporary profile removed.
 import { spawn } from "node:child_process";
-import { mkdtempSync } from "node:fs"; import { tmpdir } from "node:os"; import { join } from "node:path";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 const [bin, url] = process.argv.slice(2);
-const c = spawn(bin, ["--headless=new","--no-sandbox","--disable-gpu","--remote-debugging-port=9336",`--user-data-dir=${mkdtempSync(join(tmpdir(),"th-"))}`,"about:blank"],{stdio:"ignore"});
+if (!bin || !url || !existsSync(bin)) {
+  console.error("Usage: node tools/theme_test.mjs <chrome-binary> <url>");
+  process.exit(2);
+}
+const profile = mkdtempSync(join(tmpdir(), "theme-test-"));
+// Port 0: Chrome picks a free port and writes it to <profile>/DevToolsActivePort.
+const c = spawn(bin, ["--headless=new","--no-sandbox","--disable-gpu","--remote-debugging-port=0",`--user-data-dir=${profile}`,"about:blank"],{stdio:"ignore"});
 const sleep=(ms)=>new Promise(r=>setTimeout(r,ms)); let t, failures=0;
 try {
-  for (let i=0;i<50;i++){try{t=await (await fetch("http://127.0.0.1:9336/json")).json();break;}catch{await sleep(200);}}
+  for (let i=0;i<75;i++){try{const port=readFileSync(join(profile,"DevToolsActivePort"),"utf8").split("\n")[0].trim(); t=await (await fetch(`http://127.0.0.1:${port}/json`)).json();break;}catch{await sleep(200);}}
+  if (!t) throw new Error("Chrome did not start within 15s");
   const ws=new WebSocket(t.find(x=>x.type==="page").webSocketDebuggerUrl); await new Promise(r=>ws.addEventListener("open",r,{once:true}));
   let id=0; const pend=new Map(); ws.addEventListener("message",e=>{const m=JSON.parse(e.data); if(m.id&&pend.has(m.id)){pend.get(m.id)(m);pend.delete(m.id);}});
   const send=(method,params={})=>new Promise(r=>{const i=++id;pend.set(i,m=>r(m.result));ws.send(JSON.stringify({id:i,method,params}));});
@@ -49,5 +60,16 @@ try {
   await os("dark"); await sleep(200);
   check("after explicit choice, OS changes → ignored", await theme(), "light");
   ws.close();
-} finally { c.kill(); }
+} catch (err) {
+  console.error(`Theme test could not run: ${err.message}`);
+  failures = failures || 1;
+} finally {
+  // Wait for Chrome to exit (max 5s) before deleting its profile, or files may still be in use.
+  if (c.exitCode === null && c.signalCode === null) {
+    const exited = new Promise((r) => c.once("exit", r));
+    c.kill();
+    await Promise.race([exited, sleep(5000)]);
+  }
+  rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+}
 process.exitCode = failures ? 1 : 0;
