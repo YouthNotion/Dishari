@@ -125,6 +125,8 @@ Thanks for helping! Whether you want to fix a bug, add something new or pick up 
 | To change… | Edit |
 | --- | --- |
 | Phone, WhatsApp, email, address, Facebook, mission text, hero phrases | `ORGANISATION` in `core/content.py` |
+| Text shown in link previews and search results | `ORGANISATION.summary` in `core/content.py` (about 150 characters) |
+| The link-preview image (WhatsApp, Messenger, Facebook…) | edit the wording in `tools/make_social_image.py`, then run `python tools/make_social_image.py` (needs `pip install pillow`) |
 | Services, projects, training programmes | `SERVICE_AREAS`, `PROJECTS`, `TRAININGS` in `core/content.py` |
 | Training photos | add the image to `static/img/training/` (≤ 1200px wide, JPEG ~80%) and point `image=` at it |
 | Page layout | `templates/` |
@@ -186,7 +188,7 @@ static/
   img/                 logo (transparent), favicons, about photo, training/ photos
 public/                served at the site root: favicon.ico, robots.txt
 tests/                 pytest suite
-tools/                 responsive_audit.mjs
+tools/                 responsive_audit.mjs, theme_test.mjs, make_social_image.py
 .github/workflows/     CI
 AGENTS.md              instructions for AI coding agents (CLAUDE.md points to it)
 ```
@@ -201,6 +203,7 @@ Settings are read from environment variables. See [`.env.example`](.env.example)
 | `DJANGO_SECRET_KEY` | none | **Required** in production |
 | `DJANGO_ALLOWED_HOSTS` | none | Comma-separated. `*.vercel.app` hosts are added automatically on Vercel |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | none | e.g. `https://example.org` |
+| `DJANGO_SITE_URL` | requested host | Canonical address, e.g. `https://dishari.orgs.bd`. Link previews and the canonical link always point here, even when shared from a `*.vercel.app` URL |
 | `DJANGO_SECURE_SSL_REDIRECT` | `true` | |
 | `DJANGO_SECURE_HSTS_SECONDS` | `3600` | Raise (e.g. to `31536000`) once HTTPS is confirmed working |
 | `DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS` | `false` | Only if every subdomain is HTTPS |
@@ -219,11 +222,22 @@ The site has no database and no uploads, so it runs on Vercel with no extra serv
    string. Generate one with
    `python -c "from django.core.management.utils import get_random_secret_key as k; print(k())"`.
 3. If you add a custom domain, also set `DJANGO_ALLOWED_HOSTS` and
-   `DJANGO_CSRF_TRUSTED_ORIGINS` for it.
+   `DJANGO_CSRF_TRUSTED_ORIGINS` for it, and set `DJANGO_SITE_URL` (e.g. `https://dishari.orgs.bd`)
+   so link previews use the domain.
 
 Make sure Vercel's **System Environment Variables** are exposed to the project (an option in the
 same settings page). The settings use `VERCEL`, `VERCEL_URL` and
 `VERCEL_PROJECT_PRODUCTION_URL` to allow the `*.vercel.app` hosts.
+
+### Link previews
+
+When the site is shared on WhatsApp, Messenger, Facebook, LinkedIn or X, the preview comes
+from the Open Graph and Twitter tags in `templates/base.html`: the title, `ORGANISATION.summary`,
+and `static/img/social-preview.png` (1200×630, under 300 KB). Apps cache previews, so after
+changing them, refresh Facebook and Messenger with the
+[Sharing Debugger](https://developers.facebook.com/tools/debug/) ("Scrape Again"). WhatsApp keeps
+its own cache and updates on its own after a while; to test immediately, share the link with
+a harmless query string such as `https://dishari.orgs.bd/?v=2`.
 
 ## Deploying to a server (gunicorn)
 

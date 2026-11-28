@@ -32,6 +32,13 @@ def env_list(name: str, default: str = "") -> list[str]:
 
 DEBUG = False
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS")
+
+# Canonical public address, e.g. "https://dishari.orgs.bd". Used for the canonical link
+# and for absolute URLs in link previews (og:url, og:image), so a link shared from a
+# *.vercel.app address still points at the real domain. Empty = use the requested host.
+SITE_URL = env("DJANGO_SITE_URL", "").strip().rstrip("/")
+if SITE_URL and not SITE_URL.startswith(("https://", "http://")):
+    raise ImproperlyConfigured("DJANGO_SITE_URL must start with https:// (or http://).")
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
 
 # No database yet: only static files and the site app. Add auth/admin/sessions

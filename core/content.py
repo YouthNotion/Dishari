@@ -15,6 +15,7 @@ class Organisation:
     established_year: int
     location: str
     mission: str
+    summary: str  # one sentence for link previews and search results (~150 chars)
     hero_phrases: tuple[str, ...]
     phone: str  # display format
     email: str
@@ -64,6 +65,10 @@ ORGANISATION = Organisation(
         "training to abandoned children and helpless women, build youth capacity, and "
         "nurture the next generation of leaders for a socially inclusive and economically "
         "sustainable Bangladesh."
+    ),
+    summary=(
+        "Dishari provides shelter, care, education and skills training for abandoned "
+        "children and vulnerable women in Noakhali, Bangladesh, since 2001."
     ),
     hero_phrases=(
         "education for children",

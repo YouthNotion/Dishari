@@ -66,9 +66,10 @@ production settings.
 | `static/img/` | Logo, favicons, about photo, `training/` photos |
 | `public/` | Served at `/` (`favicon.ico`, `robots.txt`): Vercel CDN, or WhiteNoise elsewhere |
 | `pyproject.toml` / `uv.lock` | Dependency source of truth. `requirements*.txt` are generated from the lock |
-| `tests/` | pytest suite (`test_content.py`, `test_views.py`, `test_settings.py`) |
+| `tests/` | pytest suite (`test_content.py`, `test_views.py`, `test_settings.py`, `test_settings_dev.py`, `test_social_preview.py`) |
 | `tools/responsive_audit.mjs` | Headless-Chrome layout audit across 10 widths (Node 22+, no deps) |
 | `tools/theme_test.mjs` | Headless-Chrome test of the light/dark theme logic (Node 22+, no deps) |
+| `tools/make_social_image.py` | Generates `static/img/social-preview.png`, the 1200×630 link-preview image (needs Pillow) |
 | `.github/workflows/ci.yml` | CI: lock sync, ruff, pytest, deploy checks |
 
 ## Conventions and rules
@@ -80,6 +81,11 @@ production settings.
   When they do, the planned path is: models that mirror the dataclasses in `content.py`, a
   hosted Postgres DB (Vercel has no persistent disk, so no SQLite) and S3-compatible storage
   for any uploaded images.
+- **Link previews** (Open Graph + Twitter tags) live in `templates/base.html`. All their URLs
+  must be absolute: build them from `site_url` / `canonical_url` (context processor), which use
+  `settings.SITE_URL` (`DJANGO_SITE_URL`) when set. The description is `ORGANISATION.summary`.
+  The image is generated: change `tools/make_social_image.py` and re-run it. Don't hand-edit the
+  PNG. Keep it 1200×630, opaque and under 300 KB; `tests/test_social_preview.py` enforces this.
 - Images are static files in `static/img/`. Resize photos for the web (≤ 1200px wide, JPEG
   quality ~80) before committing.
 - **No inline `<script>` and no third-party scripts, fonts or CDNs.** The Content Security Policy
