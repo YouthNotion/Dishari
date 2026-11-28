@@ -101,3 +101,12 @@ def test_no_js_fallback_is_a_stylesheet_not_inline_css(client):
     assert '<noscript><link rel="stylesheet" href="/static/css/noscript.css"></noscript>' in html
     assert "<style" not in html
     assert "unsafe-inline" not in response.headers["Content-Security-Policy"]
+
+
+def test_footer_copyright_spans_founding_year_to_current_year(client):
+    from django.utils import timezone
+
+    html = _home(client)
+    year = timezone.localtime().year  # same clock and time zone as {% now "Y" %}
+
+    assert f"© 2001–{year} Dishari. All rights reserved." in html
