@@ -4,13 +4,30 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ site.name }} · {{ site.tagline }}{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}{{ site.mission|truncatewords:30 }}{% endblock %}">
+  <meta name="description" content="{{ site.summary }}">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#078a35">
+  {% block canonical %}<link rel="canonical" href="{{ canonical_url }}">{% endblock %}
+
+  {% static 'img/social-preview.png' as share_image %}
+  {# Link previews (WhatsApp, Messenger, Facebook, LinkedIn, X, ...). URLs must be absolute. #}
+  {% with title=site.name|add:" · "|add:site.tagline image=site_url|add:share_image %}
   <meta property="og:type" content="website">
-  <meta property="og:title" content="{{ site.name }} · {{ site.tagline }}">
-  <meta property="og:description" content="{{ site.mission|truncatewords:30 }}">
-  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo.png' %}">
+  <meta property="og:site_name" content="{{ site.name }}">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ site.summary }}">
+  <meta property="og:url" content="{{ canonical_url }}">
+  <meta property="og:image" content="{{ image }}">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{{ site.name }} logo with the text: {{ site.tagline }}. Since {{ site.established_year }}.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ title }}">
+  <meta name="twitter:description" content="{{ site.summary }}">
+  <meta name="twitter:image" content="{{ image }}">
+  {% endwith %}
   <link rel="icon" href="{% static 'img/favicon-32.png' %}" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
   <script src="{% static 'js/theme-init.js' %}"></script>
